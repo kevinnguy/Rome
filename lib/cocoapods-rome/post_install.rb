@@ -166,7 +166,7 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   frameworks.uniq!
   resources.uniq!
 
-  Pod::UI.puts "Copying #{frameworks.count} #{framework_label}" \
+  Pod::UI.puts "Copying #{frameworks.count} #{framework_label} " \
     "to `#{destination.relative_path_from Pathname.pwd}`"
 
   FileUtils.mkdir_p destination
@@ -176,7 +176,7 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
 
   copy_dsym_files(sandbox_root.parent + 'dSYM', configuration) if enable_dsym
 
-  build_dir.rmtree if build_dir.directory?
+#   build_dir.rmtree if build_dir.directory?
 
   if user_options["post_compile"]
     user_options["post_compile"].call(installer_context)
