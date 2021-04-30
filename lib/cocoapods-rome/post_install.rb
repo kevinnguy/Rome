@@ -64,16 +64,26 @@ def build_universal_framework(device_lib, simulator_lib, build_dir, destination,
 end
 
 def build_xcframework(frameworks, build_dir, module_name)
+  Pod::UI.puts "Building xcframework for #{module_name}"
+  
   output = "#{build_dir}/#{module_name}.xcframework"
-  return if File.exist?(output) 
+  if File.exist?(output) 
+    Pod::UI.puts "File exists: #{output}"
+    return
+  end
 
   args = %W(-create-xcframework -allow-internal-distribution -output #{output})
 
   frameworks.each do |framework|
-    return unless File.exist?(framework) 
+    Pod::UI.puts "💖 #{module_name}: Including framework #{framework}"
+    unless File.exist?(framework) 
+      Pod::UI.puts "💖 #{module_name}: Framework #{framework} doesn't exist, returning"
+      return
+    end
     args += %W(-framework #{framework})
   end
 
+  Pod::UI.puts "💖 Executing create xcframework"
   Pod::Executable.execute_command 'xcodebuild', args, true
 end
 
@@ -126,7 +136,7 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   build_dir = sandbox_root.parent + 'build'
   destination = sandbox_root.parent + 'Rome'
 
-  Pod::UI.puts 'Building frameworks'
+  Pod::UI.puts "Building #{build_xcframework ? "xc" : ""}frameworks"
 
   build_dir.rmtree if build_dir.directory?
   targets = installer_context.umbrella_targets.select { |t| t.specs.any? }
