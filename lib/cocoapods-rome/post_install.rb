@@ -177,7 +177,7 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   frameworks.uniq!
   resources.uniq!
 
-  Pod::UI.puts "Copying #{frameworks.count} #{framework_label} " \
+  Pod::UI.puts "Copying #{frameworks.count} libraries " \
     "to `#{destination.relative_path_from Pathname.pwd}`"
 
   FileUtils.mkdir_p destination
