@@ -19,6 +19,7 @@ def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, fla
     if build_xcframework
       build_xcframework([device_lib, simulator_lib], build_dir, module_name)
     else
+      Pod::UI.puts "⚠️ Building framework for #{module_name} instead"
       executable_path = "#{build_dir}/#{root_name}"
       build_universal_framework(device_lib, simulator_lib, build_dir, executable_path, module_name)
     end
