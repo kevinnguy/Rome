@@ -65,7 +65,7 @@ def build_universal_framework(device_lib, simulator_lib, build_dir, destination,
 end
 
 def build_xcframework(frameworks, build_dir, module_name)
-  Pod::UI.puts "\n🛠Building xcframework for #{module_name}"
+  Pod::UI.puts "\n🛠 Building xcframework for #{module_name}"
   
   output = "#{build_dir}/#{module_name}.xcframework"
   if File.exist?(output) 
@@ -76,7 +76,7 @@ def build_xcframework(frameworks, build_dir, module_name)
   args = %W(-create-xcframework -allow-internal-distribution -output #{output})
 
   frameworks.each do |framework|
-    Pod::UI.puts "#{module_name}: Including framework #{framework}"
+    Pod::UI.puts "#{module_name}: Including #{build_dir}"
     unless File.exist?(framework) 
       Pod::UI.puts "#{module_name}: Framework doesn't exist, not creating xcframework"
       return
