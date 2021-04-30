@@ -67,7 +67,7 @@ def build_xcframework(frameworks, build_dir, module_name)
   output = "#{build_dir}/#{module_name}.xcframework"
   return if File.exist?(output) 
 
-  args = %W(-create-xcframework -output #{output})
+  args = %W(-create-xcframework -allow-internal-distribution -output #{output})
 
   frameworks.each do |framework|
     return unless File.exist?(framework) 
