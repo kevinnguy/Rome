@@ -133,9 +133,9 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   targets.each do |target|
     case target.platform_name
     when :ios then build_for_iosish_platform(sandbox, build_dir, target, 'iphoneos', 'iphonesimulator', flags, configuration, build_xcframework)
-    when :osx then build_for_macos_platform(sandbox, build_dir, target, flags, configuration, build_xcframework)
-    when :tvos then build_for_iosish_platform(sandbox, build_dir, target, 'appletvos', 'appletvsimulator', flags, configuration, build_xcframework)
-    when :watchos then build_for_iosish_platform(sandbox, build_dir, target, 'watchos', 'watchsimulator', flags, configuration, build_xcframework)
+    when :osx then puts "Skipping osx" # build_for_macos_platform(sandbox, build_dir, target, flags, configuration, build_xcframework)
+    when :tvos then puts "Skipping tvos" # build_for_iosish_platform(sandbox, build_dir, target, 'appletvos', 'appletvsimulator', flags, configuration, build_xcframework)
+    when :watchos then puts "Skipping watchos" # build_for_iosish_platform(sandbox, build_dir, target, 'watchos', 'watchsimulator', flags, configuration, build_xcframework)
     else raise "Unknown platform '#{target.platform_name}'" end
   end
 
@@ -149,7 +149,8 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
 
   resources = []
 
-  Pod::UI.puts "Built #{frameworks.count} #{'frameworks'.pluralize(frameworks.count)}"
+  framework_label =  build_xcframework ? 'xcframeworks'.pluralize(frameworks.count) : 'frameworks'.pluralize(frameworks.count)
+  Pod::UI.puts "Built #{frameworks.count} #{framework_label}"
 
   destination.rmtree if destination.directory?
 
@@ -165,7 +166,7 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   frameworks.uniq!
   resources.uniq!
 
-  Pod::UI.puts "Copying #{frameworks.count} #{'frameworks'.pluralize(frameworks.count)} " \
+  Pod::UI.puts "Copying #{frameworks.count} #{framework_label}" \
     "to `#{destination.relative_path_from Pathname.pwd}`"
 
   FileUtils.mkdir_p destination
