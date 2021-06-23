@@ -79,7 +79,7 @@ def build_xcframework(frameworks, build_dir, module_name)
     return
   end
 
-  args = %W(-create-xcframework -allow-internal-distribution -derivedDataPath #{build_dir} -output #{output})
+  args = %W(-create-xcframework -allow-internal-distribution -output #{output})
 
   frameworks.each do |framework|
     Pod::UI.puts "#{module_name}: Including #{build_dir}"
