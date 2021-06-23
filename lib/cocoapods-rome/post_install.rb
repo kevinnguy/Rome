@@ -16,18 +16,18 @@ def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, fla
 
   spec_names = target.specs.map { |spec| [spec.root.name, spec.root.module_name] }.uniq
   spec_names.each do |root_name, module_name|
-    if libraries.length > 0 and !libraries.include?(module_name)
-      Pod::UI.puts "⚠️ Skip building framework for #{module_name}"
-      next
-    end
+    # if libraries.length > 0 and !libraries.include?(module_name)
+    #   Pod::UI.puts "⚠️ Skip building framework for #{module_name}"
+    #   next
+    # end
 
+    Pod::UI.puts "Building framework for #{module_name}"
     device_lib = "#{build_dir}/#{configuration}-#{device}/#{root_name}/#{module_name}.framework"
     simulator_lib = "#{build_dir}/#{configuration}-#{simulator}/#{root_name}/#{module_name}.framework"
 
     if build_xcframework
       build_xcframework([device_lib, simulator_lib], build_dir, module_name)
     else
-      Pod::UI.puts "⚠️ Building framework for #{module_name} instead"
       executable_path = "#{build_dir}/#{root_name}"
       build_universal_framework(device_lib, simulator_lib, build_dir, executable_path, module_name)
     end
@@ -72,16 +72,14 @@ def build_universal_framework(device_lib, simulator_lib, build_dir, destination,
   FileUtils.mv device_framework_lib, build_dir, :force => true
 end
 
-def build_xcframework(frameworks, build_dir, module_name)
-  Pod::UI.puts "\n🛠 Building xcframework for #{module_name}"
-  
+def build_xcframework(frameworks, build_dir, module_name)  
   output = "#{build_dir}/#{module_name}.xcframework"
   if File.exist?(output) 
     Pod::UI.puts "File exists: #{output}"
     return
   end
 
-  args = %W(-create-xcframework -allow-internal-distribution -output #{output})
+  args = %W(-create-xcframework -allow-internal-distribution -derivedDataPath #{build_dir} -output #{output})
 
   frameworks.each do |framework|
     Pod::UI.puts "#{module_name}: Including #{build_dir}"
@@ -92,7 +90,6 @@ def build_xcframework(frameworks, build_dir, module_name)
     args += %W(-framework #{framework})
   end
 
-  Pod::UI.puts "Executing create xcframework"
   Pod::Executable.execute_command 'xcodebuild', args, true
 end
 
