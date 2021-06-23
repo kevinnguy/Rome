@@ -4,7 +4,7 @@ PLATFORMS = { 'iphonesimulator' => 'iOS',
               'appletvsimulator' => 'tvOS',
               'watchsimulator' => 'watchOS' }
 
-def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, flags, configuration, build_xcframework=false)
+def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, flags, configuration, build_xcframework=false, libraries)
   deployment_target = target.platform_deployment_target
   target_label = target.cocoapods_target_label
 
@@ -13,6 +13,11 @@ def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, fla
 
   spec_names = target.specs.map { |spec| [spec.root.name, spec.root.module_name] }.uniq
   spec_names.each do |root_name, module_name|
+    if libraries.length && !libraries.include? module_name
+      Pod::UI.puts "⚠️ Skip building framework for #{module_name}"
+      next
+    end
+
     device_lib = "#{build_dir}/#{configuration}-#{device}/#{root_name}/#{module_name}.framework"
     simulator_lib = "#{build_dir}/#{configuration}-#{simulator}/#{root_name}/#{module_name}.framework"
 
@@ -115,6 +120,7 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   enable_dsym = user_options.fetch('dsym', true)
   configuration = user_options.fetch('configuration', 'Debug')
   build_xcframework = user_options.fetch('xcframework', false)
+  libraries = user_options.fetch('libraries', [])
 
   flags = [] 
   
@@ -143,7 +149,7 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   targets = installer_context.umbrella_targets.select { |t| t.specs.any? }
   targets.each do |target|
     case target.platform_name
-    when :ios then build_for_iosish_platform(sandbox, build_dir, target, 'iphoneos', 'iphonesimulator', flags, configuration, build_xcframework)
+    when :ios then build_for_iosish_platform(sandbox, build_dir, target, 'iphoneos', 'iphonesimulator', flags, configuration, build_xcframework, libraries)
     when :osx then puts "Skipping osx" # build_for_macos_platform(sandbox, build_dir, target, flags, configuration, build_xcframework)
     when :tvos then puts "Skipping tvos" # build_for_iosish_platform(sandbox, build_dir, target, 'appletvos', 'appletvsimulator', flags, configuration, build_xcframework)
     when :watchos then puts "Skipping watchos" # build_for_iosish_platform(sandbox, build_dir, target, 'watchos', 'watchsimulator', flags, configuration, build_xcframework)
