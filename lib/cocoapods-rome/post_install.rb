@@ -74,17 +74,10 @@ end
 
 def build_xcframework(frameworks, build_dir, module_name)  
   output = "#{build_dir}/#{module_name}.xcframework"
-  if File.exist?(output) 
-    Pod::UI.puts "File exists: #{output}"
-    return
-  end
-
   args = %W(-create-xcframework -allow-internal-distribution -output #{output})
 
   frameworks.each do |framework|
-    Pod::UI.puts "#{module_name}: Including #{build_dir}"
     unless File.exist?(framework) 
-      Pod::UI.puts "#{module_name}: Framework doesn't exist, not creating xcframework"
       return
     end
     args += %W(-framework #{framework})
