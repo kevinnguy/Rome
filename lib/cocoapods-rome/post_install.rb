@@ -73,7 +73,7 @@ def build_universal_framework(device_lib, simulator_lib, build_dir, destination,
 end
 
 def build_xcframework(frameworks, build_dir, module_name)  
-  output = "#{build_dir}/#{module_name}.xcframework"
+  output = "#{build_dir}/output/#{module_name}.xcframework"
   args = %W(-create-xcframework -allow-internal-distribution -output #{output})
 
   frameworks.each do |framework|
