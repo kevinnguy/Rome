@@ -51,7 +51,7 @@ def build_for_macos_platform(sandbox, build_dir, target, flags, configuration, b
 end
 
 def xcodebuild(sandbox, build_dir, target, sdk='macosx', deployment_target=nil, flags=nil, configuration)
-  args = %W(-project #{sandbox.project_path.realdirpath} -scheme #{target} -configuration #{configuration} -sdk #{sdk} -derivedDataPath #{build_dir})
+  args = %W(-project #{sandbox.project_path.realdirpath} -scheme #{target} -configuration #{configuration} -sdk #{sdk} -derivedDataPath #{build_dir}/derivedData)
   args += flags unless flags.nil?  
   platform = PLATFORMS[sdk]
   args += Fourflusher::SimControl.new.destination(:oldest, platform, deployment_target) unless platform.nil?
@@ -73,7 +73,7 @@ def build_universal_framework(device_lib, simulator_lib, build_dir, destination,
 end
 
 def build_xcframework(frameworks, build_dir, module_name)  
-  output = "#{build_dir}/output/#{module_name}.xcframework"
+  output = "#{build_dir}/#{module_name}.xcframework"
   args = %W(-create-xcframework -allow-internal-distribution -output #{output})
 
   frameworks.each do |framework|
