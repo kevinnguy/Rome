@@ -4,15 +4,15 @@ PLATFORMS = { 'iphonesimulator' => 'iOS',
               'appletvsimulator' => 'tvOS',
               'watchsimulator' => 'watchOS' }
 
-def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, flags, configuration, build_xcframework=false, libraries)
+def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, flags, configuration, build_xcframework=false, libraries, derivedDataPath)
   deployment_target = target.platform_deployment_target
   target_label = target.cocoapods_target_label
 
   Pod::UI.puts "🛠 Building for iphoneos"
-  xcodebuild(sandbox, build_dir, target_label, device, deployment_target, flags, configuration)
+  xcodebuild(sandbox, derivedDataPath, target_label, device, deployment_target, flags, configuration)
 
   Pod::UI.puts "🛠 Building for iphonesimulator"
-  xcodebuild(sandbox, build_dir, target_label, simulator, deployment_target, flags, configuration)
+  xcodebuild(sandbox, derivedDataPath, target_label, simulator, deployment_target, flags, configuration)
 
   spec_names = target.specs.map { |spec| [spec.root.name, spec.root.module_name] }.uniq
   spec_names.each do |root_name, module_name|
@@ -37,9 +37,9 @@ def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, fla
   end
 end
 
-def build_for_macos_platform(sandbox, build_dir, target, flags, configuration, build_xcframework=false)
+def build_for_macos_platform(sandbox, build_dir, target, flags, configuration, build_xcframework=false, derivedDataPath)
   target_label = target.cocoapods_target_label
-  xcodebuild(sandbox, build_dir, target_label, flags, configuration)
+  xcodebuild(sandbox, derivedDataPath, target_label, flags, configuration)
 
   spec_names = target.specs.map { |spec| [spec.root.name, spec.root.module_name] }.uniq
   spec_names.each do |root_name, module_name|
@@ -50,8 +50,8 @@ def build_for_macos_platform(sandbox, build_dir, target, flags, configuration, b
   end
 end
 
-def xcodebuild(sandbox, build_dir, target, sdk='macosx', deployment_target=nil, flags=nil, configuration)
-  args = %W(-project #{sandbox.project_path.realdirpath} -scheme #{target} -configuration #{configuration} -sdk #{sdk} -derivedDataPath #{build_dir}/derivedData)
+def xcodebuild(sandbox, derivedDataPath, target, sdk='macosx', deployment_target=nil, flags=nil, configuration)
+  args = %W(-project #{sandbox.project_path.realdirpath} -scheme #{target} -configuration #{configuration} -sdk #{sdk} -derivedDataPath #{derivedDataPath})
   args += flags unless flags.nil?  
   platform = PLATFORMS[sdk]
   args += Fourflusher::SimControl.new.destination(:oldest, platform, deployment_target) unless platform.nil?
@@ -134,14 +134,15 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   enable_debug_information(sandbox.project_path, configuration) if enable_dsym
 
   build_dir = sandbox_root.parent + 'build'
+  derivedDataPath = sandbox_root.parent + 'derivedData'
   destination = sandbox_root.parent + 'Rome'
 
   # build_dir.rmtree if build_dir.directory?
   targets = installer_context.umbrella_targets.select { |t| t.specs.any? }
   targets.each do |target|
     case target.platform_name
-    when :ios then build_for_iosish_platform(sandbox, build_dir, target, 'iphoneos', 'iphonesimulator', flags, configuration, build_xcframework, libraries)
-    when :osx then puts "Skipping osx" # build_for_macos_platform(sandbox, build_dir, target, flags, configuration, build_xcframework)
+    when :ios then build_for_iosish_platform(sandbox, build_dir, target, 'iphoneos', 'iphonesimulator', flags, configuration, build_xcframework, libraries, derivedDataPath)
+    when :osx then puts "Skipping osx" # build_for_macos_platform(sandbox, build_dir, target, flags, configuration, build_xcframework, derivedDataPath)
     when :tvos then puts "Skipping tvos" # build_for_iosish_platform(sandbox, build_dir, target, 'appletvos', 'appletvsimulator', flags, configuration, build_xcframework)
     when :watchos then puts "Skipping watchos" # build_for_iosish_platform(sandbox, build_dir, target, 'watchos', 'watchsimulator', flags, configuration, build_xcframework)
     else raise "Unknown platform '#{target.platform_name}'" end
