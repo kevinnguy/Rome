@@ -8,10 +8,10 @@ def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, fla
   deployment_target = target.platform_deployment_target
   target_label = target.cocoapods_target_label
 
-  Pod::UI.puts "🛠 Building for iphoneos"
+  Pod::UI.puts "🍎 Building for iphoneos"
   xcodebuild(sandbox, derivedDataPath, target_label, device, deployment_target, flags, configuration)
 
-  Pod::UI.puts "🛠 Building for iphonesimulator"
+  Pod::UI.puts "🍏 Building for iphonesimulator"
   xcodebuild(sandbox, derivedDataPath, target_label, simulator, deployment_target, flags, configuration)
 
   spec_names = target.specs.map { |spec| [spec.root.name, spec.root.module_name] }.uniq
@@ -21,7 +21,7 @@ def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, fla
       next true
     end
 
-    Pod::UI.puts "Building framework for #{module_name}"
+    Pod::UI.puts "🏗 Building framework for #{module_name}"
     device_lib = "#{build_dir}/#{configuration}-#{device}/#{root_name}/#{module_name}.framework"
     simulator_lib = "#{build_dir}/#{configuration}-#{simulator}/#{root_name}/#{module_name}.framework"
 
