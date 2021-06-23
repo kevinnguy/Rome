@@ -137,7 +137,6 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
   derivedDataPath = sandbox_root.parent + 'derivedData'
   destination = sandbox_root.parent + 'Rome'
 
-  # build_dir.rmtree if build_dir.directory?
   targets = installer_context.umbrella_targets.select { |t| t.specs.any? }
   targets.each do |target|
     case target.platform_name
@@ -185,9 +184,9 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
 
   copy_dsym_files(sandbox_root.parent + 'dSYM', configuration) if enable_dsym
 
-#   build_dir.rmtree if build_dir.directory?
-
   if user_options["post_compile"]
     user_options["post_compile"].call(installer_context)
   end
+
+  build_dir.rmtree if build_dir.directory?
 end
