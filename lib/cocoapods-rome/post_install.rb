@@ -188,5 +188,5 @@ Pod::HooksManager.register('cocoapods-rome', :post_install) do |installer_contex
     user_options["post_compile"].call(installer_context)
   end
 
-  build_dir.rmtree if build_dir.directory?
+  build_dir.rmtree if build_dir.directory? and user_options.fetch('clear_build', true)
 end
