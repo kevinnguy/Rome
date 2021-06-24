@@ -16,10 +16,10 @@ def build_for_iosish_platform(sandbox, build_dir, target, device, simulator, fla
 
   spec_names = target.specs.map { |spec| [spec.root.name, spec.root.module_name] }.uniq
   spec_names.each do |root_name, module_name|
-    if libraries.length > 0 and !libraries.include?(module_name)
-      Pod::UI.puts "⚠️ Skip building framework for #{module_name}"
-      next true
-    end
+    # if libraries.length > 0 and !libraries.include?(module_name)
+    #   Pod::UI.puts "⚠️ Skip building framework for #{module_name}"
+    #   next true
+    # end
 
     Pod::UI.puts "🏗 Building framework for #{module_name}"
     device_lib = "#{build_dir}/#{configuration}-#{device}/#{root_name}/#{module_name}.framework"
